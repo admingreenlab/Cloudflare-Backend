@@ -11,9 +11,10 @@ const router = express.Router();
 const bucketName = 'jewellery-mp4';
 const storage = multer.memoryStorage();
 const upload = multer({ storage })
+const verifyToken = require('../middleware/verifytokent');
 
 
-router.post('/upload', upload.array('file', 10), async (req, res) => {
+router.post('/upload', verifyToken, upload.array('file', 10), async (req, res) => {
   try {
     for (const file of req.files) {
       const uploadCommand = new PutObjectCommand({
@@ -34,7 +35,7 @@ router.post('/upload', upload.array('file', 10), async (req, res) => {
 });
 
 
-router.get('/files', async (req, res) => {
+router.get('/files',verifyToken, async (req, res) => {
   try {
     const listCommand = new ListObjectsV2Command({
       Bucket: bucketName,
@@ -49,7 +50,7 @@ router.get('/files', async (req, res) => {
 
 
 
-router.delete('/delete/:key', async (req, res) => {
+router.delete('/delete/:key',verifyToken, async (req, res) => {
   try {
     const deleteCommand = new DeleteObjectCommand({
       Bucket: bucketName,
@@ -64,7 +65,7 @@ router.delete('/delete/:key', async (req, res) => {
 });
 
 
-router.post('/replace/:key', upload.array('file', 1), async (req, res) => {
+router.post('/replace/:key',verifyToken, upload.array('file', 1), async (req, res) => {
   try {
     const fileKey = req.params.key;
     const file = req.files[0]; 
